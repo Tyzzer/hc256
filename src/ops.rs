@@ -6,9 +6,9 @@
 /// );
 /// ```
 pub struct Hc256Rng {
-    pub p: [u32; 1024],
-    pub q: [u32; 1024],
-    pub c: u32
+    p: [u32; 1024],
+    q: [u32; 1024],
+    c: u32
 }
 
 impl Hc256Rng {
@@ -37,7 +37,6 @@ impl Hc256Rng {
             hc256.p[i] = w[i + 512];
             hc256.q[i] = w[i + 1536];
         }
-
 
         for _ in 0..4096 {
             hc256.gen();
