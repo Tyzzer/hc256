@@ -91,3 +91,15 @@ impl Iterator for HC256 {
         }
     }
 }
+
+impl Clone for HC256 {
+    fn clone(&self) -> HC256 {
+        let mut hc256 = HC256 {
+            inner: self.inner.clone(),
+            buff: [0; 4],
+            index: self.index
+        };
+        hc256.buff.clone_from_slice(&self.buff);
+        hc256
+    }
+}

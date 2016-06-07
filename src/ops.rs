@@ -71,6 +71,20 @@ impl Hc256Rng {
     }
 }
 
+impl Clone for Hc256Rng {
+    fn clone(&self) -> Hc256Rng {
+        let mut hc256 = Hc256Rng {
+            p: [0; 1024],
+            q: [0; 1024],
+            c: 0
+        };
+        hc256.p.clone_from_slice(&self.p);
+        hc256.q.clone_from_slice(&self.q);
+        hc256.c = self.c;
+        hc256
+    }
+}
+
 
 #[inline]
 fn h(q: &[u32], u: u32) -> u32 {

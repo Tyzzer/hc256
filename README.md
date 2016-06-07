@@ -1,5 +1,5 @@
 HC-256
------
+------
 
 A implementation of HC-256 stream cipher. support `no_std` environment.
 
