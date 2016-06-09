@@ -5,11 +5,14 @@
 ///     2240350043
 /// );
 /// ```
+#[derive(Copy)]
 pub struct Hc256Rng {
     p: [u32; 1024],
     q: [u32; 1024],
     c: u32
 }
+
+impl Clone for Hc256Rng { fn clone(&self) -> Hc256Rng { *self } }
 
 impl Hc256Rng {
     pub fn init(key: &[u32], iv: &[u32]) -> Hc256Rng {
@@ -68,20 +71,6 @@ impl Hc256Rng {
 
         self.c = (self.c + 1) & 0x7ff;
         output
-    }
-}
-
-impl Clone for Hc256Rng {
-    fn clone(&self) -> Hc256Rng {
-        let mut hc256 = Hc256Rng {
-            p: [0; 1024],
-            q: [0; 1024],
-            c: 0
-        };
-        hc256.p.clone_from_slice(&self.p);
-        hc256.q.clone_from_slice(&self.q);
-        hc256.c = self.c;
-        hc256
     }
 }
 
