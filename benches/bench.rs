@@ -8,7 +8,7 @@ use hc256::HC256;
 
 
 #[bench]
-fn hc128_bench(b: &mut Bencher) {
+fn hc256_bench(b: &mut Bencher) {
     let key = [0; 32];
     let iv = [0; 32];
     let input = [0; 64];

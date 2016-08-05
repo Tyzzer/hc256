@@ -9,7 +9,7 @@
 pub struct Hc256Rng {
     p: [u32; 1024],
     q: [u32; 1024],
-    c: u32
+    c: usize
 }
 
 impl Clone for Hc256Rng { fn clone(&self) -> Hc256Rng { *self } }
@@ -49,7 +49,7 @@ impl Hc256Rng {
     }
 
     pub fn gen(&mut self) -> u32 {
-        let i = (self.c & 0x3ff) as usize;
+        let i = self.c & 0x3ff;
         let i3 = i.wrapping_sub(3) & 0x3ff;
         let i10 = i.wrapping_sub(10) & 0x3ff;
         let i12 = i.wrapping_sub(12) & 0x3ff;

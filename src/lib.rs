@@ -50,14 +50,12 @@ pub use ops::Hc256Rng;
 ///     ]
 /// );
 /// ```
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct HC256 {
     inner: Hc256Rng,
     buff: [u8; 4],
     index: usize
 }
-
-impl Clone for HC256 { fn clone(&self) -> HC256 { *self } }
 
 impl HC256 {
     pub fn new(key: &[u8], iv: &[u8]) -> HC256 {
