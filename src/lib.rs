@@ -49,6 +49,21 @@ pub use ops::Hc256Rng;
 ///         0xae, 0xb3, 0x90, 0x2f, 0x42, 0x0e, 0xd3, 0xa8
 ///     ]
 /// );
+///
+/// let mut key = [0; 32];
+/// key[0] = 0x55;
+/// let mut cipher = HC256::new(&key, &[0; 32]);
+/// cipher.process(&[0; 11], &mut output[..11]);
+/// cipher.process(&[0; 21], &mut output[11..]);
+/// assert_eq!(
+///     output,
+///     [
+///         0x1c, 0x40, 0x4a, 0xfe, 0x4f, 0xe2, 0x5f, 0xed,
+///         0x95, 0x8f, 0x9a, 0xd1, 0xae, 0x36, 0xc0, 0x6f,
+///         0x88, 0xa6, 0x5a, 0x3c, 0xc0, 0xab, 0xe2, 0x23,
+///         0xae, 0xb3, 0x90, 0x2f, 0x42, 0x0e, 0xd3, 0xa8
+///     ]
+/// );
 /// ```
 #[derive(Clone, Copy)]
 pub struct HC256 {
@@ -74,11 +89,10 @@ impl HC256 {
     pub fn process(&mut self, input: &[u8], output: &mut [u8]) {
         let mut pos = 0;
 
-        if input.len() >= self.index {
-            pos += self.index;
-            for (i, b) in self.take(pos).enumerate() {
-                output[i] = input[i] ^ b;
-            }
+        if self.index != 0 && input.len() >= 4 - self.index {
+            pos += 4 - self.index;
+            output[..pos].clone_from_slice(&self.buff[self.index..]);
+            self.index = 0;
         }
 
         while pos + 4 <= input.len() {

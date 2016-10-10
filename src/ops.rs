@@ -15,7 +15,7 @@ pub struct Hc256Rng {
 impl Clone for Hc256Rng { fn clone(&self) -> Hc256Rng { *self } }
 
 impl Hc256Rng {
-    pub fn init(key: &[u32], iv: &[u32]) -> Hc256Rng {
+    pub fn init(key: &[u32; 8], iv: &[u32; 8]) -> Hc256Rng {
         let mut w = [0; 2560];
         let mut hc256 = Hc256Rng {
             p: [0; 1024],
@@ -23,12 +23,8 @@ impl Hc256Rng {
             c: 0
         };
 
-        for i in 0..8 {
-            w[i] = key[i];
-        }
-        for i in 8..16 {
-            w[i] = iv[i - 8];
-        }
+        w[..8].clone_from_slice(key);
+        w[8..16].clone_from_slice(iv);
         for i in 16..2560 {
             w[i] = f2(w[i - 2])
                 .wrapping_add(w[i - 7])
@@ -36,10 +32,8 @@ impl Hc256Rng {
                 .wrapping_add(w[i - 16])
                 .wrapping_add(i as u32);
         }
-        for i in 0..1024 {
-            hc256.p[i] = w[i + 512];
-            hc256.q[i] = w[i + 1536];
-        }
+        hc256.p.clone_from_slice(&w[512..1536]);
+        hc256.q.clone_from_slice(&w[1536..]);
 
         for _ in 0..4096 {
             hc256.gen();
