@@ -65,11 +65,11 @@ pub use ops::Hc256Rng;
 ///     ]
 /// );
 /// ```
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct HC256 {
     inner: Hc256Rng,
-    buff: [u8; 4],
-    index: usize
+    buff: u32,
+    count: usize
 }
 
 impl HC256 {
@@ -81,18 +81,19 @@ impl HC256 {
 
         HC256 {
             inner: Hc256Rng::init(&ukey, &uiv),
-            buff: [0; 4],
-            index: 0
+            buff: 0,
+            count: 0
         }
     }
 
     pub fn process(&mut self, input: &[u8], output: &mut [u8]) {
         let mut pos = 0;
 
-        if self.index != 0 && input.len() >= 4 - self.index {
-            pos += 4 - self.index;
-            output[..pos].clone_from_slice(&self.buff[self.index..]);
-            self.index = 0;
+        if self.count != 0 && input.len() >= self.count {
+            pos += self.count;
+            for (i, b) in self.take(pos).enumerate() {
+                output[i] = input[i] ^ b;
+            }
         }
 
         while pos + 4 <= input.len() {
@@ -117,11 +118,13 @@ impl Iterator for HC256 {
     type Item = u8;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index == 0 {
-            util::u32_to_u8(self.inner.gen(), &mut self.buff);
+        if self.count == 0 {
+            self.buff = self.inner.gen();
+            self.count = 4;
         }
-        let output = self.buff[self.index];
-        self.index = (self.index + 1) % self.buff.len();
+        let output = (self.buff & 0xff) as u8;
+        self.buff >>= 8;
+        self.count -= 1;
         Some(output)
     }
 }
