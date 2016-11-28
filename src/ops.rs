@@ -1,10 +1,3 @@
-/// ```
-/// use hc256::Hc256Rng;
-/// assert_eq!(
-///     Hc256Rng::init(&[0; 8], &[0; 8]).gen(),
-///     2240350043
-/// );
-/// ```
 #[derive(Copy)]
 pub struct Hc256Rng {
     p: [u32; 1024],
@@ -17,14 +10,18 @@ impl Clone for Hc256Rng { fn clone(&self) -> Hc256Rng { *self } }
 impl Hc256Rng {
     pub fn init(key: &[u32; 8], iv: &[u32; 8]) -> Hc256Rng {
         let mut w = [0; 2560];
+        w[..8].clone_from_slice(key);
+        w[8..16].clone_from_slice(iv);
+        Self::with_w(&mut w)
+    }
+
+    pub fn with_w(w: &mut [u32; 2560]) -> Hc256Rng {
         let mut hc256 = Hc256Rng {
             p: [0; 1024],
             q: [0; 1024],
             c: 0
         };
 
-        w[..8].clone_from_slice(key);
-        w[8..16].clone_from_slice(iv);
         for i in 16..2560 {
             w[i] = f2(w[i - 2])
                 .wrapping_add(w[i - 7])
@@ -89,4 +86,12 @@ fn f2(x: u32) -> u32 {
     x.rotate_right(17)
         ^ x.rotate_right(19)
         ^ x.wrapping_shr(10)
+}
+
+#[test]
+fn test() {
+    assert_eq!(
+        Hc256Rng::init(&[0; 8], &[0; 8]).gen(),
+        2240350043
+    );
 }
