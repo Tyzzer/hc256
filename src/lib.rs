@@ -21,7 +21,7 @@ impl HC256 {
 
         for i in 0..8 {
             w[i] = LittleEndian::read_u32(&key[(i * 4)..((i + 1) * 4)]);
-            w[i + 8] = LittleEndian::read_u32(&iv[(i * 4)..((i + 1) * 4)])
+            w[i + 8] = LittleEndian::read_u32(&iv[(i * 4)..((i + 1) * 4)]);
         }
 
         HC256 {
